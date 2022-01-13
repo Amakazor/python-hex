@@ -22,10 +22,13 @@ class Gamestate:
     _menu: Menu | None
     _endscreen: Endscreen | None
 
+    _first_turn: bool
+
     def __init__(self, engine: Engine.Engine):
         self._currentState = Gamestates.MENU
         self._engine = engine
         self._won_player = None
+        self._first_turn = False
 
         MessageBus.instance().register(MessageType.FIELDSTATECHANGED, self._on_field_state_change)
         MessageBus.instance().register(MessageType.MOVEFINISHED, self._on_move_finished)
@@ -55,7 +58,11 @@ class Gamestate:
             self._enter_menu()
             self._currentState = Gamestates.MENU
 
-    def _on_gamestate_change(self, sender: object, data: ChangeGamestateData):
+    @property
+    def first_turn(self):
+        return self._first_turn
+
+    def _on_gamestate_change(self, _: object, data: ChangeGamestateData):
         self.current_state = data.gamestate
 
     def _enter_menu(self):
@@ -77,6 +84,8 @@ class Gamestate:
 
             self._won_player = None
 
+            self._first_turn = True
+
             player1 = Player("Player 1", Color(255, 50, 50))
             player2 = Player("Player 2", Color(50, 50, 255))
             self._board = Board([player1, player2], self._engine.letterbox, (self._engine.board_height,
@@ -87,13 +96,15 @@ class Gamestate:
             self._board.__del__()
             self._board = None
 
-    def _on_field_state_change(self, sender: object, data: FieldStateChangedData):
+    def _on_field_state_change(self, _: object, data: FieldStateChangedData):
         if self._currentState == Gamestates.STARTED:
             won_player = self._board.check_for_win(data.field)
             if won_player is not None:
                 self._won_player = won_player
                 self.current_state = Gamestates.FINISHED
 
-    def _on_move_finished(self, sender: object, data: None):
+    def _on_move_finished(self, _: object, __: None):
         if self._currentState == Gamestates.STARTED:
+            if self._first_turn and self._board.current_player_index == 1:
+                self._first_turn = False
             self._board.change_player()

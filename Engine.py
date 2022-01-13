@@ -80,7 +80,8 @@ class Engine:
                         self._letterbox = (self._margin, (self._height - (self._width * (1 / self._aspect_ratio))) / 2 + self._margin)
                         MessageBus.instance().message(MessageType.RESIZED, None, ResizedData(self._letterbox, (self._width * (1 / self._aspect_ratio) - 2 * self._margin, self._width - 2 * self._margin), (self._width, self._height)))
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    MessageBus.instance().message(MessageType.MOUSECLICKED, self, MouseClickedData(pygame.mouse.get_pos()))
+                    MessageBus.instance().message(MessageType.MOUSECLICKED, self, MouseClickedData(pygame.mouse.get_pos(), self._gamestate.first_turn))
+                    print(self._gamestate.first_turn)
                 elif event.type == pygame.MOUSEMOTION:
                     MessageBus.instance().message(MessageType.MOUSEMOVED, self, MouseMovedData(pygame.mouse.get_pos()))
 

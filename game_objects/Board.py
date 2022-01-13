@@ -20,6 +20,10 @@ class Board:
     def current_player(self):
         return self._players[self._current_player]
 
+    @property
+    def current_player_index(self):
+        return self._current_player
+
     def __init__(self, players: list[Player], offset: tuple[float, float], screen_size: tuple[float, float]) -> None:
         self._players = players
         self._current_player = 0

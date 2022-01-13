@@ -174,7 +174,7 @@ class Field(ITickable, IRenderable, IMouseable):
                                          self._hovered_mask + delta_time * neighbor_hovered_animation_speed_multiplier)
 
     def on_mouse_click(self, mouse_clicker: object, data: MouseClickedData):
-        if self._player is None and self.is_inside(data.position):
+        if (self._player is None or data.first_turn) and self.is_inside(data.position):
             self.player = self._board.current_player
             self.hovered = self.hovered
             MessageBus.instance().message(MessageType.FIELDSTATECHANGED, self, FieldStateChangedData.FieldStateChangedData(self))
